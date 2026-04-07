@@ -137,6 +137,22 @@ git push -u origin main
 
 </details>
 
+## Technical Modification
+
+The modification for this project adds a few new columns to the dataframe.
+
+Originally, we have the average mean difference for the three columns: requests, errors, and latency_ms.
+
+I added three more columns that show the percent change in these columns.  This was done because percentage can give more insight than mean.
+
+For instance, the mean difference in errors was 4, meaning that on average there are 4 more errors, and similarly the mean difference for latency was 1835.
+
+When we now look at the percent change for these columns, errors had a percent change of 173% and latency had a percent change of 47%.
+
+With this knowledge, we now know that even though the number for the mean difference in errors was very low (4), it had much more change than that of latency(1835).
+
+We can now easily compare the columns as percentage acts the same for all three columns and they're no longer in their own units.
+
 ## Notes
 
 - Use the **UP ARROW** and **DOWN ARROW** in the terminal to scroll through past commands.
