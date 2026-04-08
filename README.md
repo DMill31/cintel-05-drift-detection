@@ -149,7 +149,7 @@ For instance, the mean difference in errors was 4, meaning that on average there
 
 When we now look at the percent change for these columns, errors had a percent change of 173% and latency had a percent change of 47%.
 
-With this knowledge, we now know that even though the number for the mean difference in errors was very low (4), it had much more change than that of latency(1835).
+With this knowledge, we now know that even though the number for the mean difference in errors was very low (4), it had much more change than that of latency (1835).
 
 We can now easily compare the columns as percentage acts the same for all three columns and they're no longer in their own units.
 

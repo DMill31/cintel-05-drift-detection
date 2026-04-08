@@ -82,6 +82,10 @@ REQUESTS_DRIFT_THRESHOLD: Final[float] = 20.0
 ERRORS_DRIFT_THRESHOLD: Final[float] = 2.0
 LATENCY_DRIFT_THRESHOLD: Final[float] = 1000.0
 
+REQUESTS_STD_DRIFT_THRESHOLD: Final[float] = 40.0
+ERRORS_STD_DRIFT_THRESHOLD: Final[float] = 5.0
+LATENCY_STD_DRIFT_THRESHOLD: Final[float] = 2000.0
+
 # === DEFINE THE MAIN FUNCTION ===
 
 
@@ -116,9 +120,9 @@ def main() -> None:
     LOG.info(f"Loaded {current_df.height} current records")
 
     # ----------------------------------------------------
-    # STEP 2: CALCULATE AVERAGE METRICS FOR EACH PERIOD
+    # STEP 2: CALCULATE AVERAGE & STANDARD DEVIATION METRICS FOR EACH PERIOD
     # ----------------------------------------------------
-    # Summarize each dataset using average values so we can
+    # Summarize each dataset using average values  and standard deviations so we can
     # compare earlier system behavior to current system behavior.
     # We can create the summary tables by calculating the mean of each metric column
     # and providing a name for each new column that indicates
@@ -129,6 +133,9 @@ def main() -> None:
             pl.col("requests").mean().alias("reference_avg_requests"),
             pl.col("errors").mean().alias("reference_avg_errors"),
             pl.col("total_latency_ms").mean().alias("reference_avg_latency_ms"),
+            pl.col("requests").std().alias("reference_std_requests"),
+            pl.col("errors").std().alias("reference_std_errors"),
+            pl.col("total_latency_ms").std().alias("reference_std_latency_ms"),
         ]
     )
 
@@ -137,6 +144,9 @@ def main() -> None:
             pl.col("requests").mean().alias("current_avg_requests"),
             pl.col("errors").mean().alias("current_avg_errors"),
             pl.col("total_latency_ms").mean().alias("current_avg_latency_ms"),
+            pl.col("requests").std().alias("current_std_requests"),
+            pl.col("errors").std().alias("current_std_errors"),
+            pl.col("total_latency_ms").std().alias("current_std_latency_ms"),
         ]
     )
 
@@ -149,11 +159,17 @@ def main() -> None:
     #   reference_avg_requests
     #   reference_avg_errors
     #   reference_avg_latency_ms
+    #   reference_std_requests
+    #   reference_std_errors
+    #   reference_std_latency_ms
     #
     # current_summary_df:
     #   current_avg_requests
     #   current_avg_errors
     #   current_avg_latency_ms
+    #   current_std_requests
+    #   current_std_errors
+    #   current_std_latency_ms
     #
     # We combine them horizontally so both sets of values
     # appear side-by-side in a single row using the
@@ -193,6 +209,24 @@ def main() -> None:
         (pl.col("current_avg_latency_ms") - pl.col("reference_avg_latency_ms"))
         .round(2)
         .alias("latency_mean_difference_ms")
+    )
+
+    requests_std_difference_recipe: pl.Expr = (
+        (pl.col("current_std_requests") - pl.col("reference_std_requests"))
+        .round(2)
+        .alias("requests_std_difference")
+    )
+
+    errors_std_difference_recipe: pl.Expr = (
+        (pl.col("current_std_errors") - pl.col("reference_std_errors"))
+        .round(2)
+        .alias("errors_std_difference")
+    )
+
+    latency_std_difference_recipe: pl.Expr = (
+        (pl.col("current_std_latency_ms") - pl.col("reference_std_latency_ms"))
+        .round(2)
+        .alias("latency_std_difference_ms")
     )
 
     # ----------------------------------------------------
@@ -242,6 +276,9 @@ def main() -> None:
             requests_mean_difference_recipe,
             errors_mean_difference_recipe,
             latency_mean_difference_recipe,
+            requests_std_difference_recipe,
+            errors_std_difference_recipe,
+            latency_std_difference_recipe,
             requests_pct_change_recipe,
             errors_pct_change_recipe,
             latency_pct_change_recipe,
@@ -259,15 +296,18 @@ def main() -> None:
     # - much lower than reference
 
     requests_is_drifting_flag_recipe: pl.Expr = (
-        pl.col("requests_mean_difference").abs() > REQUESTS_DRIFT_THRESHOLD
+        (pl.col("requests_mean_difference").abs() > REQUESTS_DRIFT_THRESHOLD)
+        | (pl.col("requests_std_difference").abs() > REQUESTS_STD_DRIFT_THRESHOLD)
     ).alias("requests_is_drifting_flag")
 
     errors_is_drifting_flag_recipe: pl.Expr = (
-        pl.col("errors_mean_difference").abs() > ERRORS_DRIFT_THRESHOLD
+        (pl.col("errors_mean_difference").abs() > ERRORS_DRIFT_THRESHOLD)
+        | (pl.col("errors_std_difference").abs() > ERRORS_STD_DRIFT_THRESHOLD)
     ).alias("errors_is_drifting_flag")
 
     latency_is_drifting_flag_recipe: pl.Expr = (
-        pl.col("latency_mean_difference_ms").abs() > LATENCY_DRIFT_THRESHOLD
+        (pl.col("latency_mean_difference_ms").abs() > LATENCY_DRIFT_THRESHOLD)
+        | (pl.col("latency_std_difference_ms").abs() > LATENCY_STD_DRIFT_THRESHOLD)
     ).alias("latency_is_drifting_flag")
 
     # ----------------------------------------------------
