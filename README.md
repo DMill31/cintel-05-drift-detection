@@ -153,6 +153,14 @@ With this knowledge, we now know that even though the number for the mean differ
 
 We can now easily compare the columns as percentage acts the same for all three columns and they're no longer in their own units.
 
+## Custom Project
+
+The custom project for this repo is built from the modification.
+
+More signals are created and the flag logic is altered slightly.
+
+For a full description, click [Here](https://dmill31.github.io/cintel-05-drift-detection/#custom-project).
+
 ## Notes
 
 - Use the **UP ARROW** and **DOWN ARROW** in the terminal to scroll through past commands.
