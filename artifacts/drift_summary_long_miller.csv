@@ -17,9 +17,9 @@ latency_mean_difference_ms,1835.0
 requests_std_difference,1.42
 errors_std_difference,0.47
 latency_std_difference_ms,174.45
-requests_pct_change,28.22
-errors_pct_change,173.91
-latency_pct_change,47.85
+requests_mean_pct_change,28.22
+errors_mean_pct_change,173.91
+latency_mean_pct_change,47.85
 requests_is_drifting_flag,True
 errors_is_drifting_flag,True
 latency_is_drifting_flag,True

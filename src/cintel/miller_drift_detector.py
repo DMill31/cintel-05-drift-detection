@@ -238,34 +238,34 @@ def main() -> None:
     #
     # The larger the value, the larger the change relative to the reference period.
 
-    requests_pct_change_recipe: pl.Expr = (
+    requests_mean_pct_change_recipe: pl.Expr = (
         (
             (pl.col("current_avg_requests") - pl.col("reference_avg_requests"))
             / pl.col("reference_avg_requests")
             * 100
         )
         .round(2)
-        .alias("requests_pct_change")
+        .alias("requests_mean_pct_change")
     )
 
-    errors_pct_change_recipe: pl.Expr = (
+    errors_mean_pct_change_recipe: pl.Expr = (
         (
             (pl.col("current_avg_errors") - pl.col("reference_avg_errors"))
             / pl.col("reference_avg_errors")
             * 100
         )
         .round(2)
-        .alias("errors_pct_change")
+        .alias("errors_mean_pct_change")
     )
 
-    latency_pct_change_recipe: pl.Expr = (
+    latency_mean_pct_change_recipe: pl.Expr = (
         (
             (pl.col("current_avg_latency_ms") - pl.col("reference_avg_latency_ms"))
             / pl.col("reference_avg_latency_ms")
             * 100
         )
         .round(2)
-        .alias("latency_pct_change")
+        .alias("latency_mean_pct_change")
     )
 
     # ----------------------------------------------------
@@ -279,9 +279,9 @@ def main() -> None:
             requests_std_difference_recipe,
             errors_std_difference_recipe,
             latency_std_difference_recipe,
-            requests_pct_change_recipe,
-            errors_pct_change_recipe,
-            latency_pct_change_recipe,
+            requests_mean_pct_change_recipe,
+            errors_mean_pct_change_recipe,
+            latency_mean_pct_change_recipe,
         ]
     )
 
